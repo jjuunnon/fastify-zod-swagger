@@ -1,33 +1,32 @@
 import { FastifyInstance } from "fastify";
 import { createProductHandler, getProductHandler } from "./product.controller";
-import { $ref } from "./product.schema";
 
 const productRoutes = async (server: FastifyInstance) => {
-  server.post("/", {
-    schema: {
-      body: $ref("createProductBodySchema"),
-      response: {
-        201: { ...$ref("productResponseSchema"), description: "登録完了" },
-      },
-      tags: ["Product"],
+  const { prefix } = server;
+  server.zod.post(`${prefix}/`, {
+    operationId: "createProduct",
+    body: "createProductBodySchema",
+    response: {
+      201:{
+        description: "登録完了",
+        key: "productResponseSchema",
+      }
     },
-    handler: createProductHandler,
-  });
+    tags: ["Product"],
+  }, createProductHandler);
 
-  server.get("/:id", {
-    schema: {
-      params: $ref("getProductParamsSchema"),
-      querystring: $ref("getProductQuerySchema"),
-      response: {
-        200: {
-          ...$ref("productResponseSchema"),
-          description: "取得成功",
-        },
+  server.zod.get(`${prefix}/:id`, {
+    operationId: "getProduct",
+    params: "getProductParamsSchema",
+    querystring: "getProductQuerySchema",
+    response: {
+      200: {
+        key: "productResponseSchema",
+        description: "取得成功",
       },
-      tags: ["Product"],
     },
-    handler: getProductHandler,
-  });
+    tags: ["Product"],
+  }, getProductHandler);
 };
 
 export default productRoutes;

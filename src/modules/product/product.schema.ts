@@ -84,8 +84,15 @@ const schemaExamples = {
   getProductQuerySchemaExample,
 };
 
+export const productModels = {
+  createProductBodySchema,
+  productResponseSchema,
+  getProductParamsSchema,
+  getProductQuerySchema,
+};
+
 // Generate jsonschemas from zod schamas.
-export const { schemas: productSchemas, $ref } = buildJsonSchemas(
+export const productSchemas = buildJsonSchemas(
   {
     createProductBodySchema,
     productResponseSchema,
@@ -97,4 +104,4 @@ export const { schemas: productSchemas, $ref } = buildJsonSchemas(
   }
 );
 
-bindExamples(productSchemas, schemaExamples);
+bindExamples(productSchemas.schemas, schemaExamples);

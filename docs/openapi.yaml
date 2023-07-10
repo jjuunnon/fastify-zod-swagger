@@ -143,6 +143,7 @@ components:
 paths:
   /products/:
     post:
+      operationId: createProduct
       tags:
         - Product
       requestBody:
@@ -160,6 +161,7 @@ paths:
                 description: 登録完了
   "/products/{id}":
     get:
+      operationId: getProduct
       tags:
         - Product
       parameters:

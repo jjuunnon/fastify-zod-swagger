@@ -1,10 +1,15 @@
 import fastify from "fastify";
-import swagger from "@fastify/swagger";
-import swaggerUI from "@fastify/swagger-ui";
 import fs from "fs";
-import { withRefResolver } from "fastify-zod";
-import { productSchemas } from "./modules/product/product.schema";
+import { register } from "fastify-zod";
+import { productModels, productSchemas } from "./modules/product/product.schema";
 import productRoutes from "./modules/product/product.route";
+import type { FastifyZod } from "fastify-zod";
+
+declare module "fastify" {
+  interface FastifyInstance {
+    readonly zod: FastifyZod<typeof productModels>;
+  }
+}
 
 const server = fastify({
   logger: true,
@@ -19,13 +24,9 @@ const server = fastify({
 });
 
 const main = async () => {
-  for (const schema of productSchemas) {
-    server.addSchema(schema);
-  }
-
-  server.register(
-    swagger,
-    withRefResolver({
+  await register(server, {
+    jsonSchemas: productSchemas,
+    swaggerOptions: {
       openapi: {
         info: {
           title: "Sample API using Fastify and Zod.",
@@ -34,13 +35,12 @@ const main = async () => {
           version: "1.0.0",
         },
       },
-    })
-  );
-
-  server.register(swaggerUI, {
-    routePrefix: "/docs",
-    staticCSP: true,
-  })
+    },
+    swaggerUiOptions: {
+      routePrefix: "/docs",
+      staticCSP: true,
+    },
+  });
 
   server.register(productRoutes, { prefix: "/products" });
 
